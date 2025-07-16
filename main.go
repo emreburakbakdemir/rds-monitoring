@@ -6,13 +6,15 @@ import (
 	"os/exec"
 	"time"
 	"fmt"
-	"strings"
-	"syscall"
+	"github.com/emreburakbakdemir/rds-monitoring/collector"
+
 )
 
 type Config struct {
 	Interval_seconds int `json:"interval"`
 	Paths_to_watch []string `json:"paths_to_watch"`
+	Services []string `json:"services"`
+	Log_file string `json:log_file`
 }
 
 type Metrics struct {
@@ -26,7 +28,7 @@ type Metrics struct {
 func load_config(path string) (Config, error) {
 	var config Config
 	data, err := os.ReadFile(path)
-	fmt.Println(data)
+	fmt.Println(string(data))
 	if err != nil {
 		return config, err
 	}
@@ -42,19 +44,27 @@ func get_hostname() string {
 	return host
 }
 
-func check_service(service string) string {
-	cmd := exec.Command("supervisorctl", "status", service)
+// func check_service(service string) string {
+// 	cmd := exec.Command("supervisorctl", "status", service)
+// 	out, err := cmd.Output()
+// 	// fmt.Println(string(out),err)
+// 	if err != nil {
+// 		return "error"
+// 	}
+
+// 	if strings.Contains(string(out), "RUNNING") {
+// 		return string(out)
+// 	}
+
+// 	return "not running"
+// }
+
+func check_supervisor() string {
+	cmd := exec.Command("systemctl", "is-active", "supervisor")
 	out, err := cmd.Output()
-	fmt.Println(out,err)
-	if err != nil {
-		return "error"
-	}
+	if err != nil {return "error"}
 
-	if strings.Contains(string(out), "RUNNING") {
-		return "running"
-	}
-
-	return "not running"
+	return string(out)
 }
 
 func collect_metrics(config Config) Metrics {
@@ -64,13 +74,15 @@ func collect_metrics(config Config) Metrics {
 		Disk: map[string]string{"/":"TODO"},
 		Memory: map[string]string{"used": "TODO", "free": "TODO"},
 		Services: map[string]string{
-			"php-fpm": check_service("php-fpm"),
-			"nginx": check_service("nginx"),
+			"supervisor": check_supervisor(),
+			"php-fpm": collector.Check_service("php-fpm"),
+			"nginx": collector.Check_service("nginx"),
 		},
 	}
 }
 
 func main() {
+	fmt.Println("saa")
 	config, err := load_config("conf.json")
 	if err != nil {
 		fmt.Println("Failed to read the config file.", err)

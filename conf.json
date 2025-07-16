@@ -1,5 +1,8 @@
 {
     "interval": 30,
-    "paths_to_watch": ["/var/www", "/etc/supervisor"]
+    "paths_to_watch": ["/var/www", "/etc/supervisor"],
+    "services": ["nginx", "php-fpm", "supervisor"],
+    
+    "log_file": "/home/ubuntu/rds-monitoring/logs/rds-monitor-log.json"
   }
   
