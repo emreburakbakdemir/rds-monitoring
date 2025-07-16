@@ -1,0 +1,5 @@
+{
+    "interval": 30,
+    "paths_to_watch": ["/var/www", "/etc/supervisor"]
+  }
+  
