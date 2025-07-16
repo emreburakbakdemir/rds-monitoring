@@ -55,7 +55,7 @@ func collect_metrics(config Config) Metrics {
 		Disk: map[string]string{"/":"TODO"},
 		Memory: map[string]string{"used": "TODO", "free": "TODO"},
 		Services: map[string]string{
-			"supevisor": check_service("supervisor"),
+			"supervisor": check_service("supervisor"),
 			"nginx": check_service("nginx"),
 		},
 	}
