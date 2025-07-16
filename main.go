@@ -26,7 +26,7 @@ type Metrics struct {
 func load_config(path string) (Config, error) {
 	var config Config
 	data, err := os.ReadFile(path)
-	Println(data)
+	fmt.Println(data)
 	if err != nil {
 		return config, err
 	}
@@ -45,7 +45,7 @@ func get_hostname() string {
 func check_service(service string) string {
 	cmd := exec.Command("supervisorctl", "status", service)
 	out, err := cmd.Output()
-	Println(out,err)
+	fmt.Println(out,err)
 	if err != nil {
 		return "error"
 	}
