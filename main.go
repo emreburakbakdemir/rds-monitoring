@@ -44,21 +44,6 @@ func get_hostname() string {
 	return host
 }
 
-// func check_service(service string) string {
-// 	cmd := exec.Command("supervisorctl", "status", service)
-// 	out, err := cmd.Output()
-// 	// fmt.Println(string(out),err)
-// 	if err != nil {
-// 		return "error"
-// 	}
-
-// 	if strings.Contains(string(out), "RUNNING") {
-// 		return string(out)
-// 	}
-
-// 	return "not running"
-// }
-
 func check_supervisor() string {
 	cmd := exec.Command("systemctl", "is-active", "supervisor")
 	out, err := cmd.Output()
@@ -72,7 +57,7 @@ func collect_metrics(config Config) Metrics {
 		Timestamp: time.Now().Format(time.RFC3339),
 		Host: get_hostname(),
 		Disk: map[string]string{"/":"TODO"},
-		Memory: map[string]string{"used": "TODO", "free": "TODO"},
+		Memory: collector.Check_memory(),
 		Services: map[string]string{
 			"supervisor": check_supervisor(),
 			"php-fpm": collector.Check_service("php-fpm"),
@@ -82,8 +67,8 @@ func collect_metrics(config Config) Metrics {
 }
 
 func main() {
-	fmt.Println("saa")
-	config, err := load_config("conf.json")
+	// fmt.Println("saa")
+	config, err := load_config("config/conf.json")
 	if err != nil {
 		fmt.Println("Failed to read the config file.", err)
 		os.Exit(1)
