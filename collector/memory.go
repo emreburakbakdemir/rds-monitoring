@@ -1,46 +1,57 @@
 package collector
 
 import (
-	"strings"
-	"strconv"
+	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
-func extractKB(line string) int {
-	fields := strings.Fields(line)
-	if len(fields) < 2 {
-		return 0
+func humanReadableMem(bytes uint64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%d B", bytes)
 	}
-	val, err := strconv.Atoi(fields[1])
-	if err != nil {
-		return 0
+	div, exp := unit, 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
 	}
-	return val
+	return fmt.Sprintf("%.2f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
-func Check_memory() map[string]string {
-	meminfo, err := os.ReadFile("/proc/meminfo")
+func CheckMemory() map[string]string {
+	data, err := os.ReadFile("/proc/meminfo")
 	if err != nil {
 		return map[string]string{
-			"error": "cannot read /proc/meminfo",
+			"error": fmt.Sprintf("failed to read /proc/meminfo: %v", err),
 		}
 	}
 
-	lines := strings.Split(string(meminfo), "\n")
-	var total, free int
-
+	memInfo := make(map[string]uint64)
+	lines := strings.Split(string(data), "\n")
 	for _, line := range lines {
-		if strings.HasPrefix(line, "MemTotal:") {
-			total = extractKB(line)
-		} else if strings.HasPrefix(line, "MemFree:") {
-			free = extractKB(line)
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
 		}
+		key := strings.TrimSuffix(fields[0], ":")
+		value, err := strconv.ParseUint(fields[1], 10, 64)
+		if err != nil {
+			continue
+		}
+		memInfo[key] = value * 1024 // kB to bytes
 	}
-	used := total - free
 
-	return map[string]string {
-		"total_kb": strconv.Itoa(total),
-		"used_kb": strconv.Itoa(used),
-		"free_kb": strconv.Itoa(free),
+	total := memInfo["MemTotal"]
+	free := memInfo["MemFree"] + memInfo["Buffers"] + memInfo["Cached"]
+	used := total - free
+	usedPercent := float64(used) / float64(total) * 100
+
+	return map[string]string{
+		"total":        humanReadableMem(total),
+		"used":         humanReadableMem(used),
+		"free":         humanReadableMem(free),
+		"used_percent": fmt.Sprintf("%.2f", usedPercent),
 	}
 }

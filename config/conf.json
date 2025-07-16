@@ -2,7 +2,6 @@
     "interval": 30,
     "paths_to_watch": ["/var/www", "/etc/supervisor"],
     "services": ["nginx", "php-fpm", "supervisor"],
-    
+    "uptime_thresholds": [48],
     "log_file": "/home/ubuntu/rds-monitoring/logs/rds-monitor-log.json"
-  }
-  
+}

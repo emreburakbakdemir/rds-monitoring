@@ -1,0 +1,17 @@
+collector/cpu.go:
+- Collects CPU usage percentage and system load averages from /proc/stat and /proc/loadavg.
+
+collector/disk.go:
+- Gathers disk usage statistics for the root filesystem in human-readable format.
+
+collector/memory.go:
+- Reads and reports memory usage from /proc/meminfo in human-readable format.
+
+collector/services.go:
+- Checks the status of configured services using supervisorctl.
+
+collector/ps.go:
+- Finds and lists processes that have been running longer than user-configurable hour thresholds.
+
+config/conf.json:
+- User configuration for interval, services, uptime thresholds, log file, etc.
