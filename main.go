@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"time"
 	"fmt"
+	"strings"
+	"syscall"
 )
 
 type Config struct {
@@ -45,7 +47,12 @@ func check_service(service string) string {
 	if err != nil {
 		return "error"
 	}
-	return string(out)
+
+	if strings.Contains(string(out), "RUNNING") {
+		return "running"
+	}
+
+	return "not running"
 }
 
 func collect_metrics(config Config) Metrics {
