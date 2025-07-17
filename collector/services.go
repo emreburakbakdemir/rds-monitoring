@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-func Check_service(service string) string {
+func CheckService(service string) string {
 	cmd := exec.Command("supervisorctl", "status", service)
 	out, err := cmd.Output()
 	if err != nil {
