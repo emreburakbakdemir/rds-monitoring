@@ -1,4 +1,4 @@
-package serviceschecks
+package servicechecks
 
 import (
 	"fmt"

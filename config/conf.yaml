@@ -1,42 +1,74 @@
-check_interval: 30
+general:
+  check_interval: 30
+  log_file: "/home/ubuntu/rds-monitoring/logs/rds-monitor-log.json"
 
 # Disk Metrics Configuration
 # 1. mounted: true means only mounted partitions will be monitored from selected paths.
 # 2. putting '*' in paths_to_watch_disk will monitor all partitions.
-disk_metrics:
-  mounted: true
-  paths_to_watch_disk:
-    - "/"
+disk:
+  - enabled: true
+    disk_metrics:
+      mounted: true
+      paths_to_watch_disk:
+        - "/"
+
+  - enabled: true
+    filter:
+      top_disk_size: 3
+      top_disk_usage: 2
+      top_disk_usage_percent: 2
+
+  - enabled: true
+    filter:
+      sort_by: free_space
+      top_free_space: 3
 
 services:
-  - "nginx"
-  - "php-fpm"
-  - "supervisor"
+  - enabled: true
+    services:
+      # - "mysql"
+      # - "postgresql"
+      # - "redis-server"
+      # - "mongodb"
+      # - "elasticsearch"
+      # - "rabbitmq-server"
+      # - "memcached"
+      - "nginx"
+      # - "apache2"
+      # - "docker"
+      # - "kubernetes"
+      - "supervisor"
 
-log_file: "/home/ubuntu/rds-monitoring/logs/rds-monitor-log.json"
 
 # Memory Metrics Configuration
 # 1. making the values true will add them to the memory metrics report.
-memory_metrics:
-  total: true
-  available: true
-  used: true
-  free: true
-  used_percent: true
-  active: false
-  inactive: false
-  buffers: false
-  cached: true
-  shared: false
-  slab: false
-  dirty: false
+memory:
+  - enabled: true
+    types:
+      RAM: true
+      swap: false
+      total: true
 
-  swap_total: false
-  swap_used: false
-  swap_free: false
-  swap_used_percent: false
-  swap_in: false
-  swap_out: false
+    memory_metrics:
+      total: true
+      available: true
+      used: true
+      free: true
+      used_percent: true
+      active: false
+      inactive: false
+      buffers: false
+      cached: true
+      shared: false
+      slab: false
+      dirty: false
+
+      swap_total: false
+      swap_used: false
+      swap_free: false
+      swap_used_percent: false
+      swap_in: false
+      swap_out: false
 
 # Process Monitoring Configuration
 # 1. limit will limit the number of processes shown in the report.
@@ -46,8 +78,35 @@ memory_metrics:
 #   - "cpu_percent"
 #   - "memory_percent"
 #   - "name"
+processes:
+  - enabled: true
+    filter:
+      limit: 3
+      running_hour_threshold: 24
+      top_memory_usage: 5
+      top_cpu_usage: 4
+      state: "Z"
+      parent_pid: 1
+      tty: "?"
 
-process_monitoring:
-  limit: 3
-  sort_by: "memory_percent"
-  uptime_thresholds: [12, 24, 48]
+  - enabled: true
+    filter:
+      limit: 3
+      top_running_time: 3
+      top_cpu_usage: 2
+      tty: "?"
+      
+  - enabled: true
+    filter:
+      limit: 5
+      state: "S"
+
+permissions:
+  enabled: true
+  paths:
+    - "/home"
+    - "/etc"
+
+# CPU Metrics Configuration
+cpu:
+  enabled: true

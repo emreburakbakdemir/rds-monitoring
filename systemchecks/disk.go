@@ -3,22 +3,23 @@ package systemchecks
 import (
 	"fmt"
 	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/emreburakbakdemir/rds-monitoring/types"
 )
 
-type PartitionInfo struct {
-	Device       string `json:"device"`
-	Mountpoint   string `json:"mountpoint"`
-	Fstype       string `json:"fstype"`
-	Total        string `json:"total"`
-	Used         string `json:"used"`
-	Free         string `json:"free"`
-	UsedPercent  string `json:"used_percent"`
-	Error        string `json:"error,omitempty"`
-}
+// type PartitionInfo struct {
+// 	Device       string `json:"device"`
+// 	Mountpoint   string `json:"mountpoint"`
+// 	Fstype       string `json:"fstype"`
+// 	Total        string `json:"total"`
+// 	Used         string `json:"used"`
+// 	Free         string `json:"free"`
+// 	UsedPercent  string `json:"used_percent"`
+// 	Error        string `json:"error,omitempty"`
+// }
 
-type DiskReport struct {
-	Partitions []PartitionInfo `json:"partitions"`
-}
+// type DiskReport struct {
+// 	Partitions []PartitionInfo `json:"partitions"`
+// }
 
 func formatSize(bytes uint64) string {
 	gb := float64(bytes) / (1024 * 1024 * 1024)
@@ -26,8 +27,8 @@ func formatSize(bytes uint64) string {
 	return fmt.Sprintf("%.2f GB (%d KB)", gb, kb)
 }
 
-func CheckDisk(paths []string, mounted bool) DiskReport {
-	var results []PartitionInfo
+func CheckDisk(paths []string, mounted bool) types.DiskReport {
+	var results []types.PartitionInfo
 
 	// Build a map from mountpoint to device name
 	partMap := make(map[string]string)
@@ -40,7 +41,7 @@ func CheckDisk(paths []string, mounted bool) DiskReport {
 		usage, err := disk.Usage(mount)
 		deviceName := partMap[mount]
 		if err != nil {
-			results = append(results, PartitionInfo{
+			results = append(results, types.PartitionInfo{
 				Device:      deviceName,
 				Mountpoint:  mount,
 				Fstype:      "",
@@ -53,7 +54,7 @@ func CheckDisk(paths []string, mounted bool) DiskReport {
 			continue
 		}
 
-		info := PartitionInfo{
+		info := types.PartitionInfo{
 			Device:      deviceName,
 			Mountpoint:  usage.Path,
 			Fstype:      usage.Fstype,
@@ -65,5 +66,5 @@ func CheckDisk(paths []string, mounted bool) DiskReport {
 		results = append(results, info)
 	}
 
-	return DiskReport{Partitions: results}
+	return types.DiskReport{Partitions: results}
 }
