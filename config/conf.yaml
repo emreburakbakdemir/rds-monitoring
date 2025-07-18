@@ -1,0 +1,53 @@
+check_interval: 30
+
+# Disk Metrics Configuration
+# 1. mounted: true means only mounted partitions will be monitored from selected paths.
+# 2. putting '*' in paths_to_watch_disk will monitor all partitions.
+disk_metrics:
+  mounted: true
+  paths_to_watch_disk:
+    - "/"
+
+services:
+  - "nginx"
+  - "php-fpm"
+  - "supervisor"
+
+log_file: "/home/ubuntu/rds-monitoring/logs/rds-monitor-log.json"
+
+# Memory Metrics Configuration
+# 1. making the values true will add them to the memory metrics report.
+memory_metrics:
+  total: true
+  available: true
+  used: true
+  free: true
+  used_percent: true
+  active: false
+  inactive: false
+  buffers: false
+  cached: true
+  shared: false
+  slab: false
+  dirty: false
+
+  swap_total: false
+  swap_used: false
+  swap_free: false
+  swap_used_percent: false
+  swap_in: false
+  swap_out: false
+
+# Process Monitoring Configuration
+# 1. limit will limit the number of processes shown in the report.
+# 2. sorting_options are the fields by which processes can be sorted.
+# 3. uptime_thresholds are in hours, and processes with uptime greater than these values will be included in the report.
+# sorting_options:
+#   - "cpu_percent"
+#   - "memory_percent"
+#   - "name"
+
+process_monitoring:
+  limit: 3
+  sort_by: "memory_percent"
+  uptime_thresholds: [12, 24, 48]
